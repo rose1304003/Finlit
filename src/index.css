@@ -1,0 +1,323 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    /* FINLIT NETWORK Theme - Clean White with Green Accents */
+    --background: 0 0% 98%;
+    --foreground: 160 30% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 160 30% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 30% 15%;
+
+    /* Primary - Forest Green */
+    --primary: 152 55% 28%;
+    --primary-dark: 152 60% 20%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Light Mint */
+    --secondary: 150 30% 95%;
+    --secondary-foreground: 152 55% 28%;
+
+    /* Muted */
+    --muted: 150 15% 94%;
+    --muted-foreground: 160 15% 45%;
+
+    /* Accent - Gold */
+    --accent: 45 90% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Gold for coins */
+    --primary-gold: 45 90% 50%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 150 15% 90%;
+    --input: 150 15% 90%;
+    --ring: 152 55% 28%;
+
+    --radius: 1rem;
+
+    /* Project Card Colors */
+    --project-pink: 340 70% 92%;
+    --project-purple: 280 60% 92%;
+    --project-blue: 217 70% 92%;
+    --project-green: 152 50% 92%;
+    --project-orange: 35 85% 92%;
+    --project-cyan: 190 60% 92%;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 160 30% 15%;
+    --sidebar-primary: 152 55% 28%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 150 30% 95%;
+    --sidebar-accent-foreground: 152 55% 28%;
+    --sidebar-border: 150 15% 90%;
+    --sidebar-ring: 152 55% 28%;
+  }
+
+  .dark {
+    /* Dark Theme - Deep Green */
+    --background: 155 40% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 155 35% 12%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 155 35% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 152 55% 40%;
+    --primary-dark: 152 60% 30%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 155 30% 18%;
+    --secondary-foreground: 150 50% 70%;
+
+    --muted: 155 25% 15%;
+    --muted-foreground: 150 15% 55%;
+
+    --accent: 45 90% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --primary-gold: 45 90% 55%;
+
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 155 25% 20%;
+    --input: 155 25% 20%;
+    --ring: 152 55% 40%;
+
+    --sidebar-background: 155 40% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 152 55% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 155 30% 18%;
+    --sidebar-accent-foreground: 150 50% 70%;
+    --sidebar-border: 155 25% 20%;
+    --sidebar-ring: 152 55% 40%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Nunito', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* Welcome Banner Gradient */
+  .welcome-gradient {
+    background: linear-gradient(135deg, 
+      hsl(152 55% 28%) 0%, 
+      hsl(152 60% 22%) 100%
+    );
+  }
+
+  /* Hero Gradient for Splash */
+  .hero-gradient {
+    background: linear-gradient(180deg, 
+      hsl(152 60% 20%) 0%, 
+      hsl(155 55% 15%) 100%
+    );
+  }
+
+  /* Glassmorphism Card */
+  .glass-card {
+    @apply bg-card/90 backdrop-blur-xl rounded-2xl shadow-lg border border-border;
+  }
+
+  /* Section Card */
+  .section-card {
+    @apply bg-card rounded-2xl shadow-sm border border-border;
+  }
+
+  /* Colorful Project Cards */
+  .project-card-pink {
+    background: linear-gradient(135deg, 
+      hsl(340 70% 94%) 0%, 
+      hsl(320 60% 92%) 100%
+    );
+  }
+
+  .project-card-blue {
+    background: linear-gradient(135deg, 
+      hsl(217 70% 94%) 0%, 
+      hsl(230 60% 92%) 100%
+    );
+  }
+
+  .project-card-orange {
+    background: linear-gradient(135deg, 
+      hsl(35 85% 94%) 0%, 
+      hsl(25 75% 92%) 100%
+    );
+  }
+
+  .project-card-purple {
+    background: linear-gradient(135deg, 
+      hsl(280 60% 94%) 0%, 
+      hsl(260 55% 92%) 100%
+    );
+  }
+
+  .project-card-green {
+    background: linear-gradient(135deg, 
+      hsl(152 50% 94%) 0%, 
+      hsl(160 45% 92%) 100%
+    );
+  }
+
+  .project-card-cyan {
+    background: linear-gradient(135deg, 
+      hsl(190 60% 94%) 0%, 
+      hsl(200 55% 92%) 100%
+    );
+  }
+
+  /* Path Selection Card */
+  .path-card {
+    @apply bg-card rounded-2xl p-4 shadow-sm border border-border;
+  }
+
+  /* Coin Badge */
+  .coin-badge {
+    @apply flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold;
+    background: linear-gradient(135deg, 
+      hsl(45 90% 55% / 0.2) 0%, 
+      hsl(35 85% 50% / 0.15) 100%
+    );
+    color: hsl(45 90% 45%);
+  }
+
+  /* Level Badge */
+  .level-badge {
+    @apply px-3 py-1 rounded-full text-xs font-bold;
+    background: linear-gradient(135deg, 
+      hsl(152 55% 28%) 0%, 
+      hsl(152 60% 22%) 100%
+    );
+    color: white;
+  }
+
+  /* Touch Active State */
+  .touch-active {
+    @apply active:scale-[0.97] transition-transform duration-100;
+  }
+
+  /* Safe Areas */
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* List Item */
+  .list-item {
+    @apply flex items-center gap-3 py-3 border-b border-border last:border-b-0;
+  }
+
+  /* Icon Container */
+  .icon-container {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center bg-secondary text-primary;
+  }
+
+  /* Floating elements */
+  .floating {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .floating-delayed {
+    animation: float 3s ease-in-out 1s infinite;
+  }
+
+  .floating-slow {
+    animation: float 4s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  .animate-fade {
+    animation: fade 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .animate-bounce-subtle {
+    animation: bounceSubtle 2s ease-in-out infinite;
+  }
+
+  @keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0; 
+      transform: translateY(20px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes bounceSubtle {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Sparkle effect */
+  .sparkle::before {
+    content: '✨';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 14px;
+    animation: sparkle 2s ease-in-out infinite;
+  }
+
+  @keyframes sparkle {
+    0%, 100% { opacity: 0.5; transform: scale(1) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1.2) rotate(10deg); }
+  }
+}
