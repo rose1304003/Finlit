@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AnimatePresence } from 'framer-motion';
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { GamificationProvider } from "@/contexts/GamificationContext";
@@ -33,41 +33,64 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// Safe localStorage wrapper for Telegram Mini Apps
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Silently fail in restricted environments
+    }
+  }
+};
+
 // Check if user has completed onboarding
 const hasCompletedOnboarding = (): boolean => {
-  return localStorage.getItem('finlit_onboarding_complete') === 'true';
+  return safeLocalStorage.getItem('finlit_onboarding_complete') === 'true';
 };
 
 const setOnboardingComplete = (): void => {
-  localStorage.setItem('finlit_onboarding_complete', 'true');
+  safeLocalStorage.setItem('finlit_onboarding_complete', 'true');
 };
 
 type AppPhase = 'splash' | 'onboarding' | 'app';
 
 const App: React.FC = () => {
   const [phase, setPhase] = useState<AppPhase>('splash');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if we should skip onboarding
-    const skipOnboarding = hasCompletedOnboarding();
-    
-    // For development, uncomment to always show splash/onboarding:
-    // localStorage.removeItem('finlit_onboarding_complete');
-    
-    if (skipOnboarding) {
-      // Still show splash briefly, then go to app
-      const timer = setTimeout(() => {
-        setPhase('app');
-      }, 2500);
-      return () => clearTimeout(timer);
+    try {
+      const skipOnboarding = hasCompletedOnboarding();
+      
+      if (skipOnboarding) {
+        const timer = setTimeout(() => {
+          setPhase('app');
+        }, 2500);
+        return () => clearTimeout(timer);
+      }
+    } catch (e) {
+      console.error('App initialization error:', e);
+      setPhase('app'); // Skip to app on error
     }
   }, []);
 
   const handleSplashComplete = () => {
-    if (hasCompletedOnboarding()) {
+    try {
+      if (hasCompletedOnboarding()) {
+        setPhase('app');
+      } else {
+        setPhase('onboarding');
+      }
+    } catch {
       setPhase('app');
-    } else {
-      setPhase('onboarding');
     }
   };
 
@@ -75,6 +98,23 @@ const App: React.FC = () => {
     setOnboardingComplete();
     setPhase('app');
   };
+
+  // Error boundary fallback
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#13593F] flex items-center justify-center p-4">
+        <div className="text-white text-center">
+          <p>Something went wrong</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-white text-[#13593F] rounded-lg"
+          >
+            Reload
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -96,9 +136,9 @@ const App: React.FC = () => {
               )}
             </AnimatePresence>
 
-            {/* Main App */}
+            {/* Main App - Using HashRouter for Telegram compatibility */}
             {phase === 'app' && (
-              <BrowserRouter>
+              <HashRouter>
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/projects" element={<Projects />} />
@@ -116,14 +156,13 @@ const App: React.FC = () => {
                   <Route path="/challenges" element={<Challenges />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
                   <Route path="/search" element={<SearchPage />} />
-                  {/* Legacy redirect */}
                   <Route path="/events/:id" element={<Navigate to="/projects" replace />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
                 
-                {/* Global AI Chatbot - always visible */}
+                {/* Global AI Chatbot */}
                 <AIChatbot />
-              </BrowserRouter>
+              </HashRouter>
             )}
           </TooltipProvider>
         </GamificationProvider>
