@@ -1,5 +1,23 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 
+// Safe localStorage wrapper for Telegram Mini Apps
+const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Silently fail
+    }
+  }
+};
+
 export type Language = 'uz' | 'ru' | 'en';
 
 export interface UserLevel {
@@ -125,65 +143,8 @@ export const badgeDefinitions: BadgeDefinition[] = [
     rarity: 'epic',
     criteria: { type: 'level', threshold: 4 },
   },
-  {
-    id: 'goal_setter',
-    icon: '🎯',
-    name: { uz: "Maqsadli", ru: "Целеустремленный", en: "Goal Setter" },
-    description: { uz: "20 ta yangilik o'qing", ru: "Прочитайте 20 новостей", en: "Read 20 news articles" },
-    rarity: 'rare',
-    criteria: { type: 'stat', stat: 'newsReads', threshold: 20 },
-  },
-  {
-    id: 'finfox_friend',
-    icon: '🦊',
-    name: { uz: "FinFox do'sti", ru: "Друг FinFox", en: "FinFox Friend" },
-    description: { uz: "1000 tanga to'plang", ru: "Соберите 1000 монет", en: "Collect 1000 coins" },
-    rarity: 'epic',
-    criteria: { type: 'stat', stat: 'totalCoinsEarned', threshold: 1000 },
-  },
-  {
-    id: 'streak_master',
-    icon: '🔥',
-    name: { uz: "Streak ustasi", ru: "Мастер серий", en: "Streak Master" },
-    description: { uz: "7 kunlik streak", ru: "7-дневная серия", en: "7-day streak" },
-    rarity: 'rare',
-    criteria: { type: 'streak', threshold: 7 },
-  },
-  {
-    id: 'budget_pro',
-    icon: '📊',
-    name: { uz: "Budjet ustasi", ru: "Мастер бюджета", en: "Budget Pro" },
-    description: { uz: "Kalkulyatorni 20 marta ishlating", ru: "Используйте калькулятор 20 раз", en: "Use calculator 20 times" },
-    rarity: 'rare',
-    criteria: { type: 'stat', stat: 'calculatorUses', threshold: 20 },
-  },
-  {
-    id: 'glossary_guru',
-    icon: '📖',
-    name: { uz: "Lug'at ustasi", ru: "Мастер глоссария", en: "Glossary Guru" },
-    description: { uz: "50 ta atamani o'qing", ru: "Прочитайте 50 терминов", en: "Read 50 glossary terms" },
-    rarity: 'epic',
-    criteria: { type: 'stat', stat: 'glossaryReads', threshold: 50 },
-  },
-  {
-    id: 'perfect_score',
-    icon: '💯',
-    name: { uz: "Mukammal natija", ru: "Идеальный результат", en: "Perfect Score" },
-    description: { uz: "10 ta mukammal viktorina", ru: "10 идеальных викторин", en: "10 perfect quizzes" },
-    rarity: 'legendary',
-    criteria: { type: 'stat', stat: 'perfectQuizzes', threshold: 10 },
-  },
-  {
-    id: 'financial_legend',
-    icon: '👑',
-    name: { uz: "Moliyaviy afsona", ru: "Финансовая легенда", en: "Financial Legend" },
-    description: { uz: "8-darajaga yeting", ru: "Достигните 8 уровня", en: "Reach level 8" },
-    rarity: 'legendary',
-    criteria: { type: 'level', threshold: 8 },
-  },
 ];
 
-// Reward amounts for different actions
 export const REWARD_AMOUNTS = {
   GLOSSARY_READ: 5,
   NEWS_READ: 10,
@@ -244,21 +205,16 @@ const generateDailyChallenges = (): DailyChallenge[] => {
 };
 
 interface GamificationContextType {
-  // Core state
   coins: number;
   currentLevel: UserLevel;
   currentSkin: Skin;
   allSkins: Skin[];
   username: string;
-  
-  // Stats & Progress
   stats: UserStats;
   streak: StreakData;
   dailyChallenges: DailyChallenge[];
   unlockedBadges: string[];
   claimedEvents: string[];
-  
-  // Actions
   claimReward: (eventId: string, eventType: keyof typeof REWARD_AMOUNTS, metadata?: Record<string, any>) => boolean;
   addCoins: (amount: number) => void;
   setSkin: (skinId: string) => void;
@@ -267,16 +223,10 @@ interface GamificationContextType {
   checkAndUnlockBadges: () => string[];
   updateStreak: () => void;
   claimStreakReward: (day: number) => boolean;
-  
-  // Computed
   getBadgeProgress: (badgeId: string) => number;
   isBadgeUnlocked: (badgeId: string) => boolean;
-  
-  // New badge reward state
   newlyUnlockedBadge: BadgeDefinition | null;
   clearNewlyUnlockedBadge: () => void;
-  
-  // Coin animation state
   pendingCoinReward: { amount: number; eventId: string } | null;
   clearPendingCoinReward: () => void;
 }
@@ -304,160 +254,173 @@ const defaultStreak: StreakData = {
 };
 
 export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Core state
+  // Core state with safe localStorage
   const [coins, setCoins] = useState(() => {
-    const saved = localStorage.getItem('userCoins');
+    const saved = safeStorage.getItem('userCoins');
     return saved ? parseInt(saved, 10) : 0;
   });
 
   const [currentSkinId, setCurrentSkinId] = useState(() => {
-    return localStorage.getItem('userSkin') || 'default';
+    return safeStorage.getItem('userSkin') || 'default';
   });
 
   const [username, setUsernameState] = useState(() => {
-    return localStorage.getItem('username') || 'Guest';
+    return safeStorage.getItem('username') || 'Guest';
   });
 
-  // Stats & Progress
   const [stats, setStats] = useState<UserStats>(() => {
-    const saved = localStorage.getItem('userStats');
-    return saved ? JSON.parse(saved) : defaultStats;
+    const saved = safeStorage.getItem('userStats');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return defaultStats;
+      }
+    }
+    return defaultStats;
   });
 
   const [streak, setStreak] = useState<StreakData>(() => {
-    const saved = localStorage.getItem('userStreak');
-    return saved ? JSON.parse(saved) : defaultStreak;
+    const saved = safeStorage.getItem('userStreak');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return defaultStreak;
+      }
+    }
+    return defaultStreak;
   });
 
   const [dailyChallenges, setDailyChallenges] = useState<DailyChallenge[]>(() => {
-    const saved = localStorage.getItem('dailyChallenges');
-    const savedDate = localStorage.getItem('dailyChallengesDate');
+    const saved = safeStorage.getItem('dailyChallenges');
     const today = getToday();
     
-    if (saved && savedDate === today) {
-      return JSON.parse(saved);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed[0]?.id.startsWith(today)) {
+          return parsed;
+        }
+      } catch {
+        // Fall through to generate new
+      }
     }
     return generateDailyChallenges();
   });
 
   const [unlockedBadges, setUnlockedBadges] = useState<string[]>(() => {
-    const saved = localStorage.getItem('unlockedBadges');
-    return saved ? JSON.parse(saved) : ['beginner'];
+    const saved = safeStorage.getItem('unlockedBadges');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return ['beginner'];
+      }
+    }
+    return ['beginner'];
   });
 
   const [claimedEvents, setClaimedEvents] = useState<string[]>(() => {
-    const saved = localStorage.getItem('claimedEvents');
-    return saved ? JSON.parse(saved) : [];
+    const saved = safeStorage.getItem('claimedEvents');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return [];
+      }
+    }
+    return [];
   });
 
-  // UI State
   const [newlyUnlockedBadge, setNewlyUnlockedBadge] = useState<BadgeDefinition | null>(null);
   const [pendingCoinReward, setPendingCoinReward] = useState<{ amount: number; eventId: string } | null>(null);
 
-  // Persist to localStorage
-  useEffect(() => {
-    localStorage.setItem('userCoins', coins.toString());
-  }, [coins]);
+  // Compute current level
+  const currentLevel = userLevels.find(l => coins >= l.minCoins && coins <= l.maxCoins) || userLevels[0];
 
-  useEffect(() => {
-    localStorage.setItem('userSkin', currentSkinId);
-  }, [currentSkinId]);
-
-  useEffect(() => {
-    localStorage.setItem('username', username);
-  }, [username]);
-
-  useEffect(() => {
-    localStorage.setItem('userStats', JSON.stringify(stats));
-  }, [stats]);
-
-  useEffect(() => {
-    localStorage.setItem('userStreak', JSON.stringify(streak));
-  }, [streak]);
-
-  useEffect(() => {
-    localStorage.setItem('dailyChallenges', JSON.stringify(dailyChallenges));
-    localStorage.setItem('dailyChallengesDate', getToday());
-  }, [dailyChallenges]);
-
-  useEffect(() => {
-    localStorage.setItem('unlockedBadges', JSON.stringify(unlockedBadges));
-  }, [unlockedBadges]);
-
-  useEffect(() => {
-    localStorage.setItem('claimedEvents', JSON.stringify(claimedEvents));
-  }, [claimedEvents]);
-
-  // Computed values
-  const currentLevel = userLevels.find(
-    (level) => coins >= level.minCoins && coins <= level.maxCoins
-  ) || userLevels[0];
-
-  const allSkins = skins.map(skin => ({
-    ...skin,
-    unlocked: currentLevel.level >= skin.requiredLevel
+  // Compute unlocked skins
+  const allSkins = skins.map(s => ({
+    ...s,
+    unlocked: currentLevel.level >= s.requiredLevel,
   }));
 
   const currentSkin = allSkins.find(s => s.id === currentSkinId) || allSkins[0];
 
-  // Check and refresh daily challenges
+  // Persist to storage
   useEffect(() => {
-    const savedDate = localStorage.getItem('dailyChallengesDate');
-    const today = getToday();
-    
-    if (savedDate !== today) {
-      setDailyChallenges(generateDailyChallenges());
-    }
-  }, []);
+    safeStorage.setItem('userCoins', coins.toString());
+  }, [coins]);
 
-  // Core reward function (idempotent)
-  const claimReward = useCallback((
-    eventId: string,
-    eventType: keyof typeof REWARD_AMOUNTS,
-    metadata?: Record<string, any>
-  ): boolean => {
-    // Check if already claimed
+  useEffect(() => {
+    safeStorage.setItem('userSkin', currentSkinId);
+  }, [currentSkinId]);
+
+  useEffect(() => {
+    safeStorage.setItem('username', username);
+  }, [username]);
+
+  useEffect(() => {
+    safeStorage.setItem('userStats', JSON.stringify(stats));
+  }, [stats]);
+
+  useEffect(() => {
+    safeStorage.setItem('userStreak', JSON.stringify(streak));
+  }, [streak]);
+
+  useEffect(() => {
+    safeStorage.setItem('dailyChallenges', JSON.stringify(dailyChallenges));
+  }, [dailyChallenges]);
+
+  useEffect(() => {
+    safeStorage.setItem('unlockedBadges', JSON.stringify(unlockedBadges));
+  }, [unlockedBadges]);
+
+  useEffect(() => {
+    safeStorage.setItem('claimedEvents', JSON.stringify(claimedEvents));
+  }, [claimedEvents]);
+
+  // Claim reward
+  const claimReward = useCallback((eventId: string, eventType: keyof typeof REWARD_AMOUNTS, metadata?: Record<string, any>): boolean => {
     if (claimedEvents.includes(eventId)) {
       return false;
     }
 
     const rewardAmount = REWARD_AMOUNTS[eventType];
-    
-    // Grant coins
     setCoins(prev => prev + rewardAmount);
     
-    // Update stats based on event type
+    // Update stats
     setStats(prev => {
       const newStats = { ...prev, totalCoinsEarned: prev.totalCoinsEarned + rewardAmount };
       
       switch (eventType) {
         case 'GLOSSARY_READ':
-          newStats.glossaryReads = (prev.glossaryReads || 0) + 1;
+          newStats.glossaryReads = prev.glossaryReads + 1;
           break;
         case 'NEWS_READ':
-          newStats.newsReads = (prev.newsReads || 0) + 1;
+          newStats.newsReads = prev.newsReads + 1;
           break;
         case 'CALCULATOR_USE':
-          newStats.calculatorUses = (prev.calculatorUses || 0) + 1;
+          newStats.calculatorUses = prev.calculatorUses + 1;
           break;
         case 'BOOK_OPEN':
-          newStats.booksOpened = (prev.booksOpened || 0) + 1;
+          newStats.booksOpened = prev.booksOpened + 1;
           break;
         case 'BOOK_COMPLETE':
-          newStats.booksCompleted = (prev.booksCompleted || 0) + 1;
+          newStats.booksCompleted = prev.booksCompleted + 1;
           break;
         case 'CHAPTER_COMPLETE':
-          newStats.chaptersCompleted = (prev.chaptersCompleted || 0) + 1;
+          newStats.chaptersCompleted = prev.chaptersCompleted + 1;
           break;
         case 'QUIZ_COMPLETE':
-          newStats.quizzesCompleted = (prev.quizzesCompleted || 0) + 1;
+          newStats.quizzesCompleted = prev.quizzesCompleted + 1;
           break;
         case 'QUIZ_PERFECT':
-          newStats.perfectQuizzes = (prev.perfectQuizzes || 0) + 1;
-          newStats.quizzesCompleted = (prev.quizzesCompleted || 0) + 1;
+          newStats.quizzesCompleted = prev.quizzesCompleted + 1;
+          newStats.perfectQuizzes = prev.perfectQuizzes + 1;
           break;
         case 'PROJECT_VIEW':
-          newStats.projectsViewed = (prev.projectsViewed || 0) + 1;
+          newStats.projectsViewed = prev.projectsViewed + 1;
           break;
       }
       
@@ -499,21 +462,16 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       return challenge;
     }));
 
-    // Mark event as claimed
     setClaimedEvents(prev => [...prev, eventId]);
-    
-    // Set pending coin reward for animation
     setPendingCoinReward({ amount: rewardAmount, eventId });
 
     return true;
   }, [claimedEvents]);
 
-  // Legacy addCoins for backward compatibility
   const addCoins = useCallback((amount: number) => {
     setCoins(prev => prev + amount);
   }, []);
 
-  // Badge checking
   const getBadgeProgress = useCallback((badgeId: string): number => {
     const badge = badgeDefinitions.find(b => b.id === badgeId);
     if (!badge) return 0;
@@ -569,7 +527,6 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     if (newlyUnlocked.length > 0) {
       setUnlockedBadges(prev => [...prev, ...newlyUnlocked]);
       
-      // Show the first newly unlocked badge
       const firstNewBadge = badgeDefinitions.find(b => b.id === newlyUnlocked[0]);
       if (firstNewBadge) {
         setNewlyUnlockedBadge(firstNewBadge);
@@ -579,12 +536,10 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
     return newlyUnlocked;
   }, [unlockedBadges, stats, streak, currentLevel]);
 
-  // Check badges whenever stats/streak/level changes
   useEffect(() => {
     checkAndUnlockBadges();
   }, [stats, streak.currentStreak, currentLevel.level, checkAndUnlockBadges]);
 
-  // Streak management
   const updateStreak = useCallback(() => {
     const today = getToday();
     
@@ -600,7 +555,6 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       let newStreak: StreakData;
 
       if (prev.lastActiveDate === yesterdayStr) {
-        // Continuing streak
         const newCount = prev.currentStreak + 1;
         newStreak = {
           ...prev,
@@ -609,7 +563,6 @@ export const GamificationProvider: React.FC<{ children: ReactNode }> = ({ childr
           lastActiveDate: today,
         };
       } else if (prev.lastActiveDate === null || prev.lastActiveDate < yesterdayStr) {
-        // Streak broken or first activity
         newStreak = {
           ...prev,
           currentStreak: 1,
