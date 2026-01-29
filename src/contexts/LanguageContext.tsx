@@ -1,6 +1,24 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Language, getTranslation, TranslationKey } from '@/lib/i18n';
 
+// Safe localStorage wrapper
+const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // Silently fail
+    }
+  }
+};
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
@@ -11,15 +29,12 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('finlit-language');
-      return (saved as Language) || 'uz';
-    }
-    return 'uz';
+    const saved = safeStorage.getItem('finlit-language');
+    return (saved as Language) || 'uz';
   });
 
   useEffect(() => {
-    localStorage.setItem('finlit-language', language);
+    safeStorage.setItem('finlit-language', language);
   }, [language]);
 
   const t = (key: TranslationKey) => getTranslation(language, key);
