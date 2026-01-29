@@ -18,6 +18,7 @@ import Index from "./pages/Index";
 import Projects from "./pages/Projects";
 import ProjectDetail from "./pages/ProjectDetail";
 import Calculators from "./pages/Calculators";
+import Quiz from "./pages/Quiz";
 import Library from "./pages/Library";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
@@ -104,6 +105,7 @@ const App: React.FC = () => {
                   <Route path="/projects/:id" element={<ProjectDetail />} />
                   <Route path="/projects/:id/posts/:postId" element={<ProjectDetail />} />
                   <Route path="/calculators" element={<Calculators />} />
+                  <Route path="/quiz" element={<Quiz />} />
                   <Route path="/library" element={<Library />} />
                   <Route path="/library/:id" element={<BookDetail />} />
                   <Route path="/news" element={<News />} />
