@@ -66,6 +66,27 @@ const App: React.FC = () => {
   const [phase, setPhase] = useState<AppPhase>('splash');
   const [error, setError] = useState<string | null>(null);
 
+  // ✅ NEW: Catch runtime crashes and show your fallback instead of blank screen
+  useEffect(() => {
+    const onError = (event: ErrorEvent) => {
+      console.error("Window error:", event.error || event.message);
+      setError(event.message || "Unknown error");
+    };
+
+    const onRejection = (event: PromiseRejectionEvent) => {
+      console.error("Unhandled rejection:", event.reason);
+      setError(String(event.reason || "Unhandled promise rejection"));
+    };
+
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onRejection);
+
+    return () => {
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onRejection);
+    };
+  }, []);
+
   useEffect(() => {
     try {
       const skipOnboarding = hasCompletedOnboarding();
