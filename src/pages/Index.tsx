@@ -25,7 +25,7 @@ const projectColorSchemes: Array<'pink' | 'blue' | 'orange' | 'purple' | 'green'
 
 const Index: React.FC = () => {
   const { t, language } = useLanguage();
-  const { coins } = useGamification();
+  const _gamification = useGamification();
   const [selectedAudience, setSelectedAudience] = useState<string>(() => {
     return localStorage.getItem('selectedAudience') || 'kids';
   });
