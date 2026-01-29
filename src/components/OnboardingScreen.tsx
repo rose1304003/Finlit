@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { FinLitLogo } from './SplashScreen';
 
 interface OnboardingScreenProps {
@@ -100,7 +99,6 @@ const OnboardingIllustration: React.FC = () => (
 );
 
 const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleStart = () => {
