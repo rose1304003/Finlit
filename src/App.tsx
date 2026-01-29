@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component, ErrorInfo, ReactNode } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +7,48 @@ import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AnimatePresence } from 'framer-motion';
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { GamificationProvider } from "@/contexts/GamificationContext";
+
+// React Error Boundary Component
+class ErrorBoundary extends Component<
+  { children: ReactNode; fallback?: (error: Error) => ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode; fallback?: (error: Error) => ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('React Error Boundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError && this.state.error) {
+      if (this.props.fallback) {
+        return this.props.fallback(this.state.error);
+      }
+      return (
+        <div className="min-h-screen bg-[#13593F] flex items-center justify-center p-4">
+          <div className="text-white text-center">
+            <p>Something went wrong</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 px-4 py-2 bg-white text-[#13593F] rounded-lg"
+            >
+              Reload
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 // Screens
 import SplashScreen from "@/components/SplashScreen";
@@ -66,16 +108,45 @@ const App: React.FC = () => {
   const [phase, setPhase] = useState<AppPhase>('splash');
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ NEW: Catch runtime crashes and show your fallback instead of blank screen
+  // ✅ Catch runtime crashes and show fallback instead of blank screen
   useEffect(() => {
     const onError = (event: ErrorEvent) => {
-      console.error("Window error:", event.error || event.message);
-      setError(event.message || "Unknown error");
+      // Ignore non-critical resource loading errors (e.g. missing favicon, blocked images)
+      const isResourceError =
+        event.target instanceof HTMLElement ||
+        event.target instanceof HTMLImageElement ||
+        event.target instanceof HTMLLinkElement ||
+        event.target instanceof HTMLScriptElement;
+
+      if (isResourceError && !event.error && !event.message) {
+        console.warn("Ignored non-critical resource error:", event);
+        return;
+      }
+
+      // Log full error details for debugging
+      console.error("Window error:", {
+        message: event.message,
+        error: event.error,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        target: event.target
+      });
+      
+      // Only set error for actual JavaScript errors, not resource loading failures
+      if (event.error || (event.message && !isResourceError)) {
+        setError(event.message || event.error?.message || "Unknown error");
+      }
     };
 
     const onRejection = (event: PromiseRejectionEvent) => {
-      console.error("Unhandled rejection:", event.reason);
-      setError(String(event.reason || "Unhandled promise rejection"));
+      console.error("Unhandled promise rejection:", event.reason);
+      // Only set error state for actual errors, not cancellations
+      if (event.reason && typeof event.reason === 'object' && 'message' in event.reason) {
+        setError(String(event.reason.message || "Unhandled promise rejection"));
+      } else if (event.reason) {
+        setError(String(event.reason));
+      }
     };
 
     window.addEventListener("error", onError);
@@ -138,57 +209,59 @@ const App: React.FC = () => {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <GamificationProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            
-            <AnimatePresence mode="wait">
-              {/* Splash Screen */}
-              {phase === 'splash' && (
-                <SplashScreen onComplete={handleSplashComplete} />
-              )}
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <LanguageProvider>
+          <GamificationProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              
+              <AnimatePresence mode="wait">
+                {/* Splash Screen */}
+                {phase === 'splash' && (
+                  <SplashScreen onComplete={handleSplashComplete} />
+                )}
 
-              {/* Onboarding Screen */}
-              {phase === 'onboarding' && (
-                <OnboardingScreen onComplete={handleOnboardingComplete} />
-              )}
-            </AnimatePresence>
+                {/* Onboarding Screen */}
+                {phase === 'onboarding' && (
+                  <OnboardingScreen onComplete={handleOnboardingComplete} />
+                )}
+              </AnimatePresence>
 
-            {/* Main App - Using HashRouter for Telegram compatibility */}
-            {phase === 'app' && (
-              <HashRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/projects" element={<Projects />} />
-                  <Route path="/projects/:id" element={<ProjectDetail />} />
-                  <Route path="/projects/:id/posts/:postId" element={<ProjectDetail />} />
-                  <Route path="/calculators" element={<Calculators />} />
-                  <Route path="/quiz" element={<Quiz />} />
-                  <Route path="/library" element={<Library />} />
-                  <Route path="/library/:id" element={<BookDetail />} />
-                  <Route path="/news" element={<News />} />
-                  <Route path="/news/:id" element={<NewsDetail />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/glossary" element={<GlossaryPage />} />
-                  <Route path="/challenges" element={<Challenges />} />
-                  <Route path="/leaderboard" element={<Leaderboard />} />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="/events/:id" element={<Navigate to="/projects" replace />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-                
-                {/* Global AI Chatbot */}
-                <AIChatbot />
-              </HashRouter>
-            )}
-          </TooltipProvider>
-        </GamificationProvider>
-      </LanguageProvider>
-    </QueryClientProvider>
+              {/* Main App - Using HashRouter for Telegram compatibility */}
+              {phase === 'app' && (
+                <HashRouter>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/projects" element={<Projects />} />
+                    <Route path="/projects/:id" element={<ProjectDetail />} />
+                    <Route path="/projects/:id/posts/:postId" element={<ProjectDetail />} />
+                    <Route path="/calculators" element={<Calculators />} />
+                    <Route path="/quiz" element={<Quiz />} />
+                    <Route path="/library" element={<Library />} />
+                    <Route path="/library/:id" element={<BookDetail />} />
+                    <Route path="/news" element={<News />} />
+                    <Route path="/news/:id" element={<NewsDetail />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/glossary" element={<GlossaryPage />} />
+                    <Route path="/challenges" element={<Challenges />} />
+                    <Route path="/leaderboard" element={<Leaderboard />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/events/:id" element={<Navigate to="/projects" replace />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                  
+                  {/* Global AI Chatbot */}
+                  <AIChatbot />
+                </HashRouter>
+              )}
+            </TooltipProvider>
+          </GamificationProvider>
+        </LanguageProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
