@@ -102,14 +102,11 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleStart = () => {
+    // Just continue into the in-app experience
     setIsLoading(true);
-    // Open FINLIT NETWORK Telegram bot for app registration
-    // This is the main registration bot for the entire FINLIT NETWORK app
-    window.open('https://t.me/finlitnetwork_bot', '_blank');
-    // Complete onboarding after short delay
     setTimeout(() => {
       onComplete();
-    }, 500);
+    }, 400);
   };
 
   const handleSkip = () => {
