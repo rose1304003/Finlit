@@ -29,7 +29,6 @@ const UserHeader: React.FC = () => {
           </motion.div>
           <div>
             <h2 className="font-bold text-foreground text-lg">{username}</h2>
-            <p className="text-sm text-muted-foreground">@{username.toLowerCase().replace(/\s/g, '_')}</p>
           </div>
         </div>
         
