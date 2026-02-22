@@ -168,7 +168,15 @@ const ProjectDetail: React.FC = () => {
                 {project.description[language]}
               </p>
             </div>
-            <span className="text-5xl">{project.icon}</span>
+            {project.id === 'finright' ? (
+              <img 
+                src="/finright-logo.png" 
+                alt="FinRight Logo" 
+                className="h-16 w-auto object-contain"
+              />
+            ) : (
+              <span className="text-5xl">{project.icon}</span>
+            )}
           </div>
         </motion.div>
 
