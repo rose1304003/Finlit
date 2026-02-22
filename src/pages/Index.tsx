@@ -105,7 +105,7 @@ const Index: React.FC = () => {
             />
             <ProjectUpdateCard
               id="finkids"
-              title="FINKIDS TRENING"
+              title="FINKIDS"
               badge="2 MART"
               time="SOAT 15:00"
               colorScheme="pink"
