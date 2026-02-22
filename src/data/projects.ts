@@ -116,7 +116,7 @@ export const projects: Project[] = [
           en: "FINLIT NETWORK SPEECH"
         },
         description: {
-          uz: "FINLIT NETWORK SPEECH loyihasi doirasida yangi audio sessiya. Moliyaviy savodxonlik bo'yicha qisqa va amaliy tushunchalar: byudjet tuzish, daromad-xarajat nazorati, tejash odatlari.",
+          uz: "FINLIT NETWORK SPEECH loyihasi doirasida yangi audio sessiya. Moliyaviy savodxonlik bo'yicha qisqa va amaliy tushunchalar: budjet tuzish, daromad-xarajat nazorati, tejash odatlari.",
           ru: "Новая аудио сессия в рамках проекта FINLIT NETWORK SPEECH. Практические понятия по финансовой грамотности.",
           en: "New audio session as part of FINLIT NETWORK SPEECH project. Practical concepts on financial literacy."
         },
@@ -131,12 +131,12 @@ export const projects: Project[] = [
         id: 'speech-video-1',
         type: 'video',
         title: {
-          uz: "Byudjet tuzish asoslari",
+          uz: "Budjet tuzish asoslari",
           ru: "Основы бюджетирования",
           en: "Budgeting Basics"
         },
         description: {
-          uz: "Shaxsiy byudjet qanday tuziladi? Daromad va xarajatlarni nazorat qilish usullari.",
+          uz: "Shaxsiy budjet qanday tuziladi? Daromad va xarajatlarni nazorat qilish usullari.",
           ru: "Как составить личный бюджет? Методы контроля доходов и расходов.",
           en: "How to create a personal budget? Methods for controlling income and expenses."
         },
@@ -148,12 +148,12 @@ export const projects: Project[] = [
         id: 'speech-quiz-1',
         type: 'quiz',
         title: {
-          uz: "Byudjet bo'yicha test",
+          uz: "Budjet bo'yicha test",
           ru: "Тест по бюджету",
           en: "Budget Quiz"
         },
         description: {
-          uz: "Byudjet tuzish bo'yicha bilimingizni sinab ko'ring!",
+          uz: "Budjet tuzish bo'yicha bilimingizni sinab ko'ring!",
           ru: "Проверьте свои знания по составлению бюджета!",
           en: "Test your budgeting knowledge!"
         },
@@ -163,7 +163,7 @@ export const projects: Project[] = [
           {
             id: 'q1',
             question: {
-              uz: "Byudjet nima?",
+              uz: "Budjet nima?",
               ru: "Что такое бюджет?",
               en: "What is a budget?"
             },
@@ -174,7 +174,7 @@ export const projects: Project[] = [
             },
             correctIndex: 1,
             explanation: {
-              uz: "Byudjet - bu ma'lum davr uchun daromad va xarajatlar rejasi.",
+              uz: "Budjet - bu ma'lum davr uchun daromad va xarajatlar rejasi.",
               ru: "Бюджет - это план доходов и расходов на определенный период.",
               en: "A budget is a plan for income and expenses over a period of time."
             }
@@ -227,9 +227,9 @@ export const projects: Project[] = [
         id: 'finkids-event-1',
         type: 'event',
         title: {
-          uz: "FINKIDS TRENING",
-          ru: "FINKIDS ТРЕНИНГ",
-          en: "FINKIDS TRAINING"
+          uz: "FINKIDS",
+          ru: "FINKIDS",
+          en: "FINKIDS"
         },
         description: {
           uz: "Bolalar uchun moliyaviy savodxonlik mashg'uloti. Bolalar pul nima ekanini, tejash va to'g'ri sarflashni o'rganadilar.",
@@ -523,19 +523,19 @@ export const projects: Project[] = [
     ]
   },
 
-  // FINTALK
+  // FINLIT NETWORK (merges FINLIT TALK and FINLIT CLUB)
   {
     id: 'fintalk',
-    name: 'FINTALK',
+    name: 'FINLIT NETWORK',
     title: {
-      uz: "FINTALK",
-      ru: "FINTALK",
-      en: "FINTALK"
+      uz: "FINLIT NETWORK",
+      ru: "FINLIT NETWORK",
+      en: "FINLIT NETWORK"
     },
     description: {
-      uz: "Moliyaviy podkastlar va suhbatlar",
-      ru: "Финансовые подкасты и беседы",
-      en: "Financial podcasts and talks"
+      uz: "Moliyaviy suhbatlar va ingliz tilida moliyaviy ko'nikmalar klubi",
+      ru: "Финансовые беседы и клуб финансовых знаний на английском языке",
+      en: "Financial talks and English-language financial literacy club"
     },
     color: '#8B5CF6',
     gradientFrom: '#C4B5FD',
@@ -558,6 +558,22 @@ export const projects: Project[] = [
         },
         videoUrl: 'https://www.youtube.com/watch?v=example2',
         date: '2025-01-08',
+        coinReward: 10,
+      },
+      {
+        id: 'finlit-club-article-1',
+        type: 'article',
+        title: {
+          uz: "FINLIT NETWORK haqida",
+          ru: "О FINLIT NETWORK",
+          en: "About FINLIT NETWORK"
+        },
+        description: {
+          uz: "FINLIT NETWORK — moliyaviy savodxonlik bo'yicha ingliz tilida muloqot klubi. Yoshlar moliyaviy terminlarni ingliz tilida o'rganadilar va xalqaro darajadagi bilim oladilar. Klub a'zolari har haftada uchrashib, turli moliyaviy mavzularda fikr almashadi, prezentatsiyalar qiladi va munozaralar o'tkazadi.",
+          ru: "FINLIT NETWORK — клуб для общения на английском языке на темы финансовой грамотности. Молодёжь изучает финансовые термины на английском и получает знания международного уровня. Члены клуба встречаются каждую неделю, обмениваются мнениями, делают презентации и проводят дискуссии.",
+          en: "FINLIT NETWORK is a club for communicating in English on financial literacy topics. Young people learn financial terms in English and gain international-level knowledge. Club members meet weekly to exchange opinions, make presentations, and hold discussions."
+        },
+        date: '2025-01-10',
         coinReward: 10,
       },
     ]
