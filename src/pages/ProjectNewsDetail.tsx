@@ -36,7 +36,7 @@ const projectEvents: ProjectEvent[] = [
     colorScheme: 'green',
     location: "Toshkent shahri, Alisher Navoiy ko'chasi, 1A uy",
     description: {
-      uz: "FINLIT NETWORK SPEECH (14:00) loyihasi doirasida yangi audio sessiya ishga tushdi. Unda moliyaviy savodxonlik bo'yicha qisqa va amaliy tushunchalar beriladi: byudjet tuzish, daromad-xarajat nazorati, tejash odatlari, maqsad qo'yish jamg'arma va oddiy investitsiya prinsiplari. Sessiya formati: 10-15 daqiqalik audio + asosiy xulosalar + kichik test. Ishtirokchilar savollarni yuborishi mumkin, eng ko'p berilgan savollarga keyingi chiqishda javob beriladi.",
+      uz: "FINLIT NETWORK SPEECH (14:00) loyihasi doirasida yangi audio sessiya ishga tushdi. Unda moliyaviy savodxonlik bo'yicha qisqa va amaliy tushunchalar beriladi: budjet tuzish, daromad-xarajat nazorati, tejash odatlari, maqsad qo'yish jamg'arma va oddiy investitsiya prinsiplari. Sessiya formati: 10-15 daqiqalik audio + asosiy xulosalar + kichik test. Ishtirokchilar savollarni yuborishi mumkin, eng ko'p berilgan savollarga keyingi chiqishda javob beriladi.",
       ru: "В рамках проекта FINLIT NETWORK SPEECH (14:00) запущена новая аудиосессия. В ней даются краткие и практические понятия по финансовой грамотности: составление бюджета, контроль доходов и расходов, привычки экономии, постановка целей, принципы накопления и простых инвестиций.",
       en: "As part of the FINLIT NETWORK SPEECH (14:00) project, a new audio session has been launched. It provides brief and practical concepts on financial literacy: budgeting, income and expense control, saving habits, goal setting, principles of savings and simple investments."
     },
@@ -57,7 +57,7 @@ const projectEvents: ProjectEvent[] = [
   },
   {
     id: 'finkids-trening',
-    title: 'FINKIDS TRENING',
+    title: 'FINKIDS',
     badge: '2 MART',
     time: 'SOAT 15:00',
     date: '2 mart',
@@ -65,9 +65,9 @@ const projectEvents: ProjectEvent[] = [
     image: '/events/finkids.png',
     colorScheme: 'pink',
     description: {
-      uz: "FINKIDS TRENING — bolalar uchun mo'ljallangan interaktiv moliyaviy savodxonlik dasturi. Ushbu trening bolalarga puning qiymatini tushunish, tejash, to'g'ri tanlov qilish va mas'uliyatli o'rganishga yordam beradi.",
-      ru: "FINKIDS TRENING — интерактивная программа финансовой грамотности, предназначенная для детей. Этот тренинг помогает детям понять ценность денег, экономить, делать правильный выбор и учиться ответственности.",
-      en: "FINKIDS TRENING is an interactive financial literacy program designed for children. This training helps children understand the value of money, save, make the right choices, and learn responsibility."
+      uz: "FINKIDS — bolalar uchun mo'ljallangan interaktiv moliyaviy savodxonlik dasturi. Ushbu dastur bolalarga puning qiymatini tushunish, tejash, to'g'ri tanlov qilish va mas'uliyatli o'rganishga yordam beradi.",
+      ru: "FINKIDS — интерактивная программа финансовой грамотности, предназначенная для детей. Эта программа помогает детям понять ценность денег, экономить, делать правильный выбор и учиться ответственности.",
+      en: "FINKIDS is an interactive financial literacy program designed for children. This program helps children understand the value of money, save, make the right choices, and learn responsibility."
     },
     details: {
       uz: [
