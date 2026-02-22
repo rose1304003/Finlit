@@ -7,43 +7,90 @@ import { X } from 'lucide-react';
 
 interface QuizQuestion {
   id: string;
-  question: string;
-  options: string[];
+  question: { uz: string; ru: string; en: string };
+  options: { uz: string[]; ru: string[]; en: string[] };
   correctIndex: number;
 }
 
 const quizQuestions: QuizQuestion[] = [
   {
     id: '1',
-    question: "Daromad va xarajat nima uchun rejalashtiriladi?",
-    options: ["Tejash uchun", "Qarzni oshirish uchun", "Pulni sarflash uchun"],
+    question: {
+      uz: "Daromad va xarajat nima uchun rejalashtiriladi?",
+      ru: "Зачем планируют доходы и расходы?",
+      en: "Why are income and expenses planned?",
+    },
+    options: {
+      uz: ["Tejash uchun", "Qarzni oshirish uchun", "Pulni sarflash uchun"],
+      ru: ["Для экономии", "Чтобы увеличить долг", "Чтобы тратить деньги"],
+      en: ["To save money", "To increase debt", "To spend money"],
+    },
     correctIndex: 0,
   },
   {
     id: '2',
-    question: "Byudjet nima?",
-    options: ["Pul yig'ish usuli", "Daromad va xarajatlar rejasi", "Bank hisobi"],
+    question: {
+      uz: "Budjet nima?",
+      ru: "Что такое бюджет?",
+      en: "What is a budget?",
+    },
+    options: {
+      uz: ["Pul yig'ish usuli", "Daromad va xarajatlar rejasi", "Bank hisobi"],
+      ru: ["Способ накопления денег", "План доходов и расходов", "Банковский счёт"],
+      en: ["A way to save money", "A plan for income and expenses", "A bank account"],
+    },
     correctIndex: 1,
   },
   {
     id: '3',
-    question: "50/30/20 qoidasi nima?",
-    options: ["Uyqu/Ish/Dam olish", "Ehtiyoj/Xohish/Tejash", "Bank foizi"],
+    question: {
+      uz: "50/30/20 qoidasi nima?",
+      ru: "Что такое правило 50/30/20?",
+      en: "What is the 50/30/20 rule?",
+    },
+    options: {
+      uz: ["Uyqu/Ish/Dam olish", "Ehtiyoj/Xohish/Tejash", "Bank foizi"],
+      ru: ["Сон/Работа/Отдых", "Потребности/Желания/Сбережения", "Банковский процент"],
+      en: ["Sleep/Work/Rest", "Needs/Wants/Savings", "Bank interest"],
+    },
     correctIndex: 1,
   },
   {
     id: '4',
-    question: "Bank hech qachon nima so'ramaydi?",
-    options: ["Ismingiz", "Karta raqami va CVV", "Telefon raqami"],
+    question: {
+      uz: "Bank hech qachon nima so'ramaydi?",
+      ru: "Что банк никогда не спрашивает?",
+      en: "What does a bank never ask for?",
+    },
+    options: {
+      uz: ["Ismingiz", "Karta raqami va CVV", "Telefon raqami"],
+      ru: ["Ваше имя", "Номер карты и CVV", "Номер телефона"],
+      en: ["Your name", "Card number and CVV", "Phone number"],
+    },
     correctIndex: 1,
   },
   {
     id: '5',
-    question: "Favqulodda fond nima?",
-    options: ["Oylik maosh", "Kutilmagan xarajatlar uchun jamg'arma", "Kredit"],
+    question: {
+      uz: "Favqulodda fond nima?",
+      ru: "Что такое чрезвычайный фонд?",
+      en: "What is an emergency fund?",
+    },
+    options: {
+      uz: ["Oylik maosh", "Kutilmagan xarajatlar uchun jamg'arma", "Kredit"],
+      ru: ["Месячная зарплата", "Накопления на непредвиденные расходы", "Кредит"],
+      en: ["Monthly salary", "Savings for unexpected expenses", "A loan"],
+    },
     correctIndex: 1,
   },
 ];
+
+const labels = {
+  congratulations: { uz: "Tabriklaymiz!", ru: "Поздравляем!", en: "Congratulations!" },
+  yourScore: { uz: "Sizning natijangiz:", ru: "Ваш результат:", en: "Your score:" },
+  coinsEarned: { uz: "tanga oldingiz!", ru: "монет получено!", en: "coins earned!" },
+  backHome: { uz: "Bosh sahifaga qaytish", ru: "На главную", en: "Back to Home" },
+};
 
 const Quiz: React.FC = () => {
   const { language } = useLanguage();
@@ -109,7 +156,6 @@ const Quiz: React.FC = () => {
     }
   };
 
-  // Option styles matching Figma Images 7-9
   const getOptionStyle = (index: number) => {
     if (!showResult) return 'bg-white text-[#13563D]';
     if (index === question.correctIndex) return 'bg-[#00CE93] text-white';
@@ -117,8 +163,8 @@ const Quiz: React.FC = () => {
     return 'bg-white text-[#13563D]';
   };
 
-  // Quiz completed
   if (quizCompleted) {
+    const earnedCoins = score >= totalQuestions * 0.8 ? 50 : 20;
     return (
       <div className="min-h-screen bg-[#13513B] flex flex-col relative overflow-hidden">
         <div 
@@ -133,11 +179,11 @@ const Quiz: React.FC = () => {
             animate={{ scale: 1, opacity: 1 }}
           >
             <div className="text-7xl mb-6">🏆</div>
-            <h2 className="text-3xl font-bold text-white mb-4">Tabriklaymiz!</h2>
-            <p className="text-xl text-white/80 mb-2">Sizning natijangiz:</p>
+            <h2 className="text-3xl font-bold text-white mb-4">{labels.congratulations[language]}</h2>
+            <p className="text-xl text-white/80 mb-2">{labels.yourScore[language]}</p>
             <p className="text-6xl font-bold text-[#FFEE5A] mb-6">{score} / {totalQuestions}</p>
             <p className="text-xl text-[#00CE93] font-medium mb-10">
-              +{score >= totalQuestions * 0.8 ? 50 : 20} tanga oldingiz!
+              +{earnedCoins} {labels.coinsEarned[language]}
             </p>
             
             <motion.button
@@ -146,7 +192,7 @@ const Quiz: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Bosh sahifaga qaytish
+              {labels.backHome[language]}
             </motion.button>
           </motion.div>
         </div>
@@ -160,7 +206,6 @@ const Quiz: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#13513B] flex flex-col relative overflow-hidden">
-      {/* Radial glow */}
       <div 
         className="absolute top-[-211px] left-1/2 transform -translate-x-1/2 w-[640px] h-[640px] rounded-full"
         style={{ background: 'rgba(5, 220, 127, 0.23)', filter: 'blur(250px)' }}
@@ -197,23 +242,32 @@ const Quiz: React.FC = () => {
         </div>
       </div>
 
-      {/* Question Image Card */}
-      <div className="relative z-10 mx-4 mt-4 mb-6">
-        <div className="bg-white rounded-2xl p-6 flex items-center justify-center" style={{ aspectRatio: '16/10' }}>
-          <span className="text-6xl">💰📊📈</span>
-        </div>
+      {/* Progress bar */}
+      <div className="relative z-10 mx-4 mt-2 mb-2 bg-white/20 rounded-full h-1">
+        <div 
+          className="bg-white rounded-full h-1 transition-all duration-300"
+          style={{ width: `${((currentQuestion) / totalQuestions) * 100}%` }}
+        />
+      </div>
+
+      {/* Question category */}
+      <div className="relative z-10 px-4 mb-2 flex items-center gap-2">
+        <span className="text-white/70 text-sm">
+          {language === 'uz' ? 'Budjet' : language === 'ru' ? 'Бюджет' : 'Budget'}
+        </span>
+        <span className="text-white/50 text-sm">{currentQuestion + 1}/{totalQuestions}</span>
       </div>
 
       {/* Question Text */}
-      <div className="relative z-10 px-6 mb-8">
+      <div className="relative z-10 px-6 mb-8 mt-4">
         <h2 className="text-2xl font-semibold text-white text-center leading-tight">
-          {question.question}
+          {question.question[language]}
         </h2>
       </div>
 
-      {/* Answer Options - White pills */}
+      {/* Answer Options */}
       <div className="relative z-10 px-4 space-y-4 flex-1">
-        {question.options.map((option, index) => (
+        {question.options[language].map((option, index) => (
           <motion.button
             key={index}
             onClick={() => handleAnswerSelect(index)}
